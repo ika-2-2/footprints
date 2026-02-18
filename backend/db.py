@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
 load_dotenv()
 
@@ -17,6 +18,18 @@ DATABASE_URL = (
 
 engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
+sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+class base(DeclarativeBase):
+    pass
+
 def test_connection():
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
+
+def get_db():
+    db = sessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

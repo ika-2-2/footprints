@@ -20,3 +20,11 @@ class Post(Base):
     created_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
 
     user = relationship("User")
+
+class UnlockedPost(Base):
+    __tablename__ = "unlocked_posts"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
+    unlocked_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())

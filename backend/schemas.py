@@ -20,3 +20,13 @@ class PostOut(BaseModel):
     # ORM(Post)をそのまま返してもOK
     class Config:
         from_attributes = True
+
+class UnlockRequest(BaseModel):
+    user_id: int = Field(..., ge=1)
+    lat: float
+    lng: float
+
+class UnlockOut(BaseModel):
+    already_unlocked: bool
+    unlocked: bool
+    distance_m: float

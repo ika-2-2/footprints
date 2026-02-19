@@ -20,7 +20,7 @@ engine = create_engine(DATABASE_URL, pool_pre_ping=True)
 
 sessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-class base(DeclarativeBase):
+class Base(DeclarativeBase):
     pass
 
 def test_connection():

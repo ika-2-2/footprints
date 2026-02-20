@@ -7,6 +7,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False, deffault="")
     created_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
 
 class Post(Base):

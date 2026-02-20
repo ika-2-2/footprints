@@ -30,3 +30,11 @@ class UnlockOut(BaseModel):
     already_unlocked: bool
     unlocked: bool
     distance_m: float
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginOut(BaseModel):
+    user_id: int
+    username: str

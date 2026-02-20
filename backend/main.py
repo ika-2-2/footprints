@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
-from models import Post, UnlockedPost
-from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut
+from models import Post, UnlockedPost, User
+from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut
 import math
 
 app = FastAPI()
@@ -38,6 +38,18 @@ def root():
     return {"ok": True}
 
 
+@app.post("/login", response_model=LoginOut)
+def login(payload: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(
+        User.username == payload.username,
+        User.password == payload.password,
+    ).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="ユーザー名またはパスワードが違います")
+    return LoginOut(user_id=user.id, username=user.username)
+
+
+# 投稿作成?
 @app.post("/posts", response_model=PostOut)
 def create_post(payload: PostCreate, db:Session = Depends(get_db)):
     # id存在チェックまだ
@@ -53,6 +65,7 @@ def create_post(payload: PostCreate, db:Session = Depends(get_db)):
     return post
 
 
+# 投稿解放
 @app.post("/posts/{post_id}/unlock", response_model=UnlockOut)
 def unlock_post(post_id: int, payload: UnlockRequest, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -79,6 +92,7 @@ def unlock_post(post_id: int, payload: UnlockRequest, db: Session = Depends(get_
     return UnlockOut(already_unlocked=False, unlocked=True, distance_m=round(dist, 2))
 
 
+# 
 @app.get("/posts/unlocked", response_model=list[PostOut])
 def get_unlocked_posts(user_id: int, db: Session = Depends(get_db)):
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
@@ -88,9 +102,19 @@ def get_unlocked_posts(user_id: int, db: Session = Depends(get_db)):
     return posts
 
 
+# 
 @app.get("/posts/{post_id}", response_model=PostOut)
 def read_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
     if post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return post
+
+
+@app.get("/timeline", response_model=PostOut)
+def get_timeline(user_id: int, db: Session = Depends(get_db)):
+    unlocked_ids = db.query(UnlockedPost.post_id).filter(
+        UnlockedPost.user_id == user_id
+    ).subquery()
+    posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
+    return posts

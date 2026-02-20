@@ -1,13 +1,20 @@
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
 from models import Post, UnlockedPost, User
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut
 import math
+import os, shutil
 
 app = FastAPI()
+
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.add_middleware(
     CORSMiddleware,
@@ -49,15 +56,32 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     return LoginOut(user_id=user.id, username=user.username)
 
 
-# 投稿作成?
+# 投稿作成
 @app.post("/posts", response_model=PostOut)
-def create_post(payload: PostCreate, db:Session = Depends(get_db)):
-    # id存在チェックまだ
+def create_post(
+    user_id: int = Form(...),
+    body: str = Form(...),
+    lat: float = Form(...),
+    lng: float = Form(...),
+    place_name: str = Form(...),
+    rating: int = Form(...),
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
+    ext = os.path.splitext(image.filename)[1]
+    filename = f"{user_id}_{int(__import__('time').time())}{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as f:
+        shutil.copyfileobj(image.file, f)
+
     post = Post(
-        user_id=payload.user_id,
-        body=payload.body,
-        lat=payload.lat,
-        lng=payload.lng,
+        user_id=user_id,
+        body=body,
+        lat=lat,
+        lng=lng,
+        place_name=place_name,
+        rating=rating,
+        image_path=filename,
     )
     db.add(post)
     db.commit()
@@ -111,7 +135,7 @@ def read_post(post_id: int, db: Session = Depends(get_db)):
     return post
 
 
-@app.get("/timeline", response_model=PostOut)
+@app.get("/timeline", response_model=list[PostOut])
 def get_timeline(user_id: int, db: Session = Depends(get_db)):
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
         UnlockedPost.user_id == user_id

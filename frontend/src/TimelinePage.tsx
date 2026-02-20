@@ -3,12 +3,20 @@ import type { LoginInfo } from "./App";
 
 const API = "http://localhost:8000";
 
-type Post = { id: number; user_id: number; body: string; lat: number; lng: number; };
+type Post = {
+  id: number;
+  user_id: number;
+  body: string;
+  lat: number;
+  lng: number;
+  image_path: string;
+  place_name: string;
+  rating: number;
+  created_at: string;
+};
 
 export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; onGoPost: () => void }) {
   const [timeline, setTimeline] = useState<Post[]>([]);
-  const [postId, setPostId] = useState("");
-  const [unlockResult, setUnlockResult] = useState("");
 
   const fetchTimeline = async () => {
     const res = await fetch(`${API}/timeline?user_id=${login.user_id}`);
@@ -18,60 +26,66 @@ export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; on
 
   useEffect(() => { fetchTimeline(); }, []);
 
-  const handleUnlock = () => {
-    if (!postId) return;
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const res = await fetch(`${API}/posts/${postId}/unlock`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user_id: login.user_id, lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      });
-      const data = await res.json();
-      if (data.unlocked) {
-        setUnlockResult(`✅ 解放！ 距離: ${data.distance_m}m`);
-        fetchTimeline();
-      } else {
-        setUnlockResult(`❌ 範囲外 距離: ${data.distance_m}m`);
-      }
-    });
-  };
-
   return (
     <div className="container">
       <header>
-        <h1>Footprints</h1>
+        <span className="header-logo">Footprints</span>
         <span className="username">{login.username}</span>
       </header>
 
-      <button className="post-fab" onClick={onGoPost}>＋ 投稿する</button>
-
-      <section className="card">
-        <h2>投稿を解放する</h2>
-        <div className="unlock-row">
-          <input type="number" placeholder="post_id" value={postId} onChange={(e) => setPostId(e.target.value)} />
-          <button onClick={handleUnlock}>現在地で解放</button>
-        </div>
-        {unlockResult && <p className="status">{unlockResult}</p>}
-      </section>
-
-      <section className="card">
-        <div className="tl-header">
-          <h2>タイムライン</h2>
-          <button className="small" onClick={fetchTimeline}>更新</button>
-        </div>
+      <div className="tl-list">
         {timeline.length === 0 ? (
-          <p className="empty">解放済みの投稿がありません。現地へ行こう！</p>
+          <div className="empty-tl">
+            <p>👣</p>
+            <p>さんぽをして投稿を集めよう！</p>
+          </div>
         ) : (
-          <ul className="timeline">
-            {timeline.map((post) => (
-              <li key={post.id} className="post-card">
-                <p>{post.body}</p>
-                <small>by user:{post.user_id} / {post.lat.toFixed(4)}, {post.lng.toFixed(4)}</small>
-              </li>
-            ))}
-          </ul>
+          timeline.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))
         )}
-      </section>
+      </div>
+
+      {/* 下メニューバー */}
+      <nav className="bottom-nav">
+        <button className="nav-item active">🏠<span>TL</span></button>
+        <button className="nav-item">🔍<span>検索</span></button>
+        <button className="nav-item post-btn" onClick={onGoPost}>＋</button>
+        <button className="nav-item">🔔<span>通知</span></button>
+        <button className="nav-item">👤<span>マイページ</span></button>
+      </nav>
+    </div>
+  );
+}
+
+function PostCard({ post }: { post: Post }) {
+  const date = new Date(post.created_at).toLocaleDateString("ja-JP", {
+    month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+
+  return (
+    <div className="post-card">
+      <div className="post-card-header">
+        <div className="avatar" />
+        <span className="post-username">user:{post.user_id}</span>
+      </div>
+      <img
+        src={`${API}/uploads/${post.image_path}`}
+        alt={post.place_name}
+        className="post-image"
+      />
+      <div className="post-card-body">
+        <div className="post-meta">
+          <span className="post-place">📍 {post.place_name}</span>
+          <span className="post-date">{date}</span>
+        </div>
+        <div className="post-stars">
+          {[1,2,3,4,5].map((s) => (
+            <span key={s} className={s <= post.rating ? "star on" : "star"}>★</span>
+          ))}
+        </div>
+        <p className="post-body">{post.body}</p>
+      </div>
     </div>
   );
 }

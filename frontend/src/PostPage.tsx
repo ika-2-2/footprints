@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { LoginInfo } from "./App";
+import "./css/PostPage.css";
 
 const API = "http://localhost:8000";
 

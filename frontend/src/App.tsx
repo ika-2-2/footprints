@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "./App.css";
+import "./css/App.css";
 import LoginPage from "./LoginPage.tsx";
 import TimelinePage from "./TimelinePage.tsx";
 import PostPage from "./PostPage.tsx";

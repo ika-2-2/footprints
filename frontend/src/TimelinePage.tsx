@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { LoginInfo } from "./App";
+import "./css/TimelinePage.css";
 
 const API = "http://localhost:8000";
 

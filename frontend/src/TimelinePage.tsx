@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { LoginInfo, Post } from "./App";
 import BottomNav from "./BottomNav";
+import "./css/common.css";
 import "./css/TimelinePage.css";
 
 const API = "http://localhost:8000";

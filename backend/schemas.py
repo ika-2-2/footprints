@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from datetime import datetime
 
 
 # クライアント→サーバー
@@ -16,8 +17,11 @@ class PostOut(BaseModel):
     body: str
     lat: float
     lng: float
+    image_path: str
+    place_name: str
+    rating: int
+    created_at: datetime
 
-    # ORM(Post)をそのまま返してもOK
     class Config:
         from_attributes = True
 
@@ -30,3 +34,11 @@ class UnlockOut(BaseModel):
     already_unlocked: bool
     unlocked: bool
     distance_m: float
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginOut(BaseModel):
+    user_id: int
+    username: str

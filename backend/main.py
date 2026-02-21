@@ -1,13 +1,13 @@
+import math
+import os, shutil
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
-from models import Post, UnlockedPost, User
-from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut
-import math
-import os, shutil
+from models import Post, UnlockedPost, User, Comment, Like
+from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut
 
 app = FastAPI()
 
@@ -18,7 +18,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -159,3 +159,67 @@ def get_timeline(user_id: int, db: Session = Depends(get_db)):
     posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
     return posts
 
+
+@app.get("/posts/{post_id}/comments", response_model=list[CommentOut])
+def get_comments(post_id: int, db: Session = Depends(get_db)):
+    comments = db.query(Comment).filter(Comment.post_id == post_id).order_by(Comment.created_at).all()
+    result = []
+    for c in comments:
+        result.append(CommentOut(
+            id=c.id,
+            post_id=c.post_id,
+            user_id=c.user_id,
+            body=c.body,
+            created_at=c.created_at,
+            username=c.user.username,
+        ))
+    return result
+
+
+@app.post("/posts/{post_id}/comments", response_model=CommentOut)
+def create_comment(post_id: int, payload: CommentCreate, db: Session = Depends(get_db)):
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    comment = Comment(post_id=post_id, user_id=payload.user_id, body=payload.body)
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+    return CommentOut(
+        id=comment.id,
+        post_id=comment.post_id,
+        user_id=comment.user_id,
+        body=comment.body,
+        created_at=comment.created_at,
+        username=comment.user.username,
+    )
+
+
+@app.post("/posts/{post_id}/like", response_model=LikeOut)
+def toggle_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
+    existing = db.query(Like).filter(
+        Like.post_id == post_id,
+        Like.user_id == user_id,
+    ).first()
+
+    if existing:
+        db.delete(existing)
+        db.commit()
+        liked = False
+    else:
+        db.add(Like(post_id=post_id, user_id=user_id))
+        db.commit()
+        liked = True
+
+    count = db.query(Like).filter(Like.post_id == post_id).count()
+    return LikeOut(post_id=post_id, liked=liked, count=count)
+
+
+@app.get("/posts/{post_id}/like", response_model=LikeOut)
+def get_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
+    liked = db.query(Like).filter(
+        Like.post_id == post_id,
+        Like.user_id == user_id,
+    ).first() is not None
+    count = db.query(Like).filter(Like.post_id == post_id).count()
+    return LikeOut(post_id=post_id, liked=liked, count=count)

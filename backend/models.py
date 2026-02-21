@@ -1,6 +1,7 @@
 from sqlalchemy import BigInteger, DateTime, Double, ForeignKey, Text, String, SmallInteger, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db import Base
+from datetime import datetime
 
 class User(Base):
     __tablename__ = "users"
@@ -32,3 +33,23 @@ class UnlockedPost(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
     post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
     unlocked_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
+
+class Comment(Base):
+    __tablename__ = "comments"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
+    body: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp())
+
+    user = relationship("User")
+
+
+class Like(Base):
+    __tablename__ = "likes"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[int] = mapped_column(DateTime, server_default=func.current_timestamp())

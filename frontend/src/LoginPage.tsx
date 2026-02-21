@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { LoginInfo } from "./App";
+import "./css/App.css"
+import "./css/common.css";
 import "./css/LoginPage.css";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => void }) {
   const [tab, setTab] = useState<"login" | "register">("login");
@@ -43,7 +45,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        <h1>Footprints</h1>
+        <h1>footprints</h1>
         <p className="login-sub">おかえりなさい</p>
 
         <div className="tab-row">

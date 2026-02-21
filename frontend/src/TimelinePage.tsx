@@ -1,22 +1,16 @@
 import { useEffect, useState } from "react";
-import type { LoginInfo } from "./App";
+import type { LoginInfo, Post } from "./App";
+import BottomNav from "./BottomNav";
+import "./css/common.css";
 import "./css/TimelinePage.css";
 
 const API = "http://localhost:8000";
 
-type Post = {
-  id: number;
-  user_id: number;
-  body: string;
-  lat: number;
-  lng: number;
-  image_path: string;
-  place_name: string;
-  rating: number;
-  created_at: string;
-};
-
-export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; onGoPost: () => void }) {
+export default function TimelinePage({ login, onGoPost, onGoDetail}: { 
+  login: LoginInfo; 
+  onGoPost: () => void;
+  onGoDetail: (post: Post) => void;
+}) {
   const [timeline, setTimeline] = useState<Post[]>([]);
 
   const fetchTimeline = async () => {
@@ -71,44 +65,24 @@ export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; on
           </div>
         ) : (
           timeline.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <PostCard key={post.id} post={post} onClick={() => onGoDetail(post)} />
           ))
         )}
       </div>
 
       {/* 下メニューバー */}
-      <nav className="bottom-nav">
-        <button className="nav-item active" onClick={unlockNearby}>
-          <i className="fa-solid fa-house"></i>
-          <span>TL</span>
-        </button>
-        <button className="nav-item">
-          <i className="fa-solid fa-magnifying-glass"></i>
-          <span>検索</span>
-        </button>
-        <button className="nav-item post-btn" onClick={onGoPost}>
-          <i className="fa-solid fa-plus"></i>
-        </button>
-        <button className="nav-item">
-          <i className="fa-solid fa-bell"></i>
-          <span>通知</span>
-        </button>
-        <button className="nav-item">
-          <i className="fa-solid fa-user"></i>
-          <span>マイページ</span>
-        </button>
-      </nav>
+      <BottomNav active="timeline" onGoTimeline={unlockNearby} onGoPost={onGoPost} />
     </div>
   );
 }
 
-function PostCard({ post }: { post: Post }) {
+function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
   const date = new Date(post.created_at).toLocaleDateString("ja-JP", {
     month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
 
   return (
-    <div className="post-card">
+    <div className="post-card" onClick={onClick} style={{cursor: "pointer"}}>
       <div className="post-card-header">
         <div className="avatar" />
         <span className="post-username">user:{post.user_id}</span>

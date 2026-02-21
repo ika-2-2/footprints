@@ -1,4 +1,4 @@
-from sqlalchemy import BigInteger, DateTime, Double, ForeignKey, Text, String, func
+from sqlalchemy import BigInteger, DateTime, Double, ForeignKey, Text, String, SmallInteger, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from db import Base
 
@@ -7,6 +7,7 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(String(255), nullable=False, default="")
     created_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
 
 class Post(Base):
@@ -17,6 +18,17 @@ class Post(Base):
     body: Mapped[str] = mapped_column(Text, nullable=False)
     lat: Mapped[float] = mapped_column(Double, nullable=False)
     lng: Mapped[float] = mapped_column(Double, nullable=False)
+    image_path: Mapped[str] = mapped_column(String(255), nullable=True)
+    place_name: Mapped[str] = mapped_column(String(100), nullable=True)
+    rating: Mapped[int] = mapped_column(SmallInteger, nullable=True)
     created_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
 
     user = relationship("User")
+
+class UnlockedPost(Base):
+    __tablename__ = "unlocked_posts"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
+    post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
+    unlocked_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())

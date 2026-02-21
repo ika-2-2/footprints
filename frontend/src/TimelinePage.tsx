@@ -1,0 +1,135 @@
+import { useEffect, useState } from "react";
+import type { LoginInfo } from "./App";
+import "./css/TimelinePage.css";
+
+const API = "http://localhost:8000";
+
+type Post = {
+  id: number;
+  user_id: number;
+  body: string;
+  lat: number;
+  lng: number;
+  image_path: string;
+  place_name: string;
+  rating: number;
+  created_at: string;
+};
+
+export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; onGoPost: () => void }) {
+  const [timeline, setTimeline] = useState<Post[]>([]);
+
+  const fetchTimeline = async () => {
+    const res = await fetch(`${API}/timeline?user_id=${login.user_id}`);
+    const data = await res.json();
+    setTimeline(data);
+  };
+  
+
+  const unlockNearby = () => {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+
+      // 近くの未解放投稿を取得
+      const res = await fetch(
+        `${API}/posts/nearby?lat=${latitude}&lng=${longitude}&user_id=${login.user_id}`
+      );
+      const nearby: Post[] = await res.json();
+
+      // 全部unlock
+      await Promise.all(
+        nearby.map((post) =>
+          fetch(`${API}/posts/${post.id}/unlock`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: login.user_id, lat: latitude, lng: longitude }),
+          })
+        )
+      );
+
+      // TL更新
+      fetchTimeline();
+    });
+  };
+
+  useEffect(() => {
+    unlockNearby(); // 近くの投稿を解放してからTL取得
+  }, []);
+
+  return (
+    <div className="container">
+      <header>
+        <span className="header-logo">Footprints</span>
+        <span className="username">{login.username}</span>
+      </header>
+
+      <div className="tl-list">
+        {timeline.length === 0 ? (
+          <div className="empty-tl">
+            <p>👣</p>
+            <p>さんぽをして投稿を集めよう！</p>
+          </div>
+        ) : (
+          timeline.map((post) => (
+            <PostCard key={post.id} post={post} />
+          ))
+        )}
+      </div>
+
+      {/* 下メニューバー */}
+      <nav className="bottom-nav">
+        <button className="nav-item active" onClick={unlockNearby}>
+          <i className="fa-solid fa-house"></i>
+          <span>TL</span>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-magnifying-glass"></i>
+          <span>検索</span>
+        </button>
+        <button className="nav-item post-btn" onClick={onGoPost}>
+          <i className="fa-solid fa-plus"></i>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-bell"></i>
+          <span>通知</span>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-user"></i>
+          <span>マイページ</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+function PostCard({ post }: { post: Post }) {
+  const date = new Date(post.created_at).toLocaleDateString("ja-JP", {
+    month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
+  });
+
+  return (
+    <div className="post-card">
+      <div className="post-card-header">
+        <div className="avatar" />
+        <span className="post-username">user:{post.user_id}</span>
+      </div>
+      <img
+        src={`${API}/uploads/${post.image_path}`}
+        alt={post.place_name}
+        className="post-image"
+      />
+      <div className="post-card-body">
+        <div className="post-meta">
+          <span className="post-place">📍 {post.place_name}</span>
+          <span className="post-date">{date}</span>
+        </div>
+        <div className="post-stars">
+          {[1,2,3,4,5].map((s) => (
+            <span key={s} className={s <= post.rating ? "star on" : "star"}>★</span>
+          ))}
+        </div>
+        <p className="post-body">{post.body}</p>
+      </div>
+    </div>
+  );
+}

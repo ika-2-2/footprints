@@ -8,6 +8,5 @@ backend/venv
 backend/__pycache__
 backend/.env
 backend/*.pyc
-backend/uploads/*
-
+backend/uploads/
 claude.md

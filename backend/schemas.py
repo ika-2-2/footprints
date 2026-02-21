@@ -57,3 +57,8 @@ class CommentOut(BaseModel):
 class CommentCreate(BaseModel):
     user_id: int
     body: str = Field(..., min_length=1, max_length=500) #文字数制限
+
+class LikeOut(BaseModel):
+    post_id: int
+    liked: bool
+    count: int

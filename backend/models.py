@@ -44,3 +44,12 @@ class Comment(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp())
 
     user = relationship("User")
+
+
+class Like(Base):
+    __tablename__ = "likes"
+
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    post_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("posts.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[int] = mapped_column(DateTime, server_default=func.current_timestamp())

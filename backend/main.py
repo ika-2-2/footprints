@@ -6,8 +6,8 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
-from models import Post, UnlockedPost, User, Comment
-from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut
+from models import Post, UnlockedPost, User, Comment, Like
+from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut
 
 app = FastAPI()
 
@@ -194,3 +194,32 @@ def create_comment(post_id: int, payload: CommentCreate, db: Session = Depends(g
         username=comment.user.username,
     )
 
+
+@app.post("/posts/{post_id}/like", response_model=LikeOut)
+def toggle_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
+    existing = db.query(Like).filter(
+        Like.post_id == post_id,
+        Like.user_id == user_id,
+    ).first()
+
+    if existing:
+        db.delete(existing)
+        db.commit()
+        liked = False
+    else:
+        db.add(Like(post_id=post_id, user_id=user_id))
+        db.commit()
+        liked = True
+
+    count = db.query(Like).filter(Like.post_id == post_id).count()
+    return LikeOut(post_id=post_id, liked=liked, count=count)
+
+
+@app.get("/posts/{post_id}/like", response_model=LikeOut)
+def get_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
+    liked = db.query(Like).filter(
+        Like.post_id == post_id,
+        Like.user_id == user_id,
+    ).first() is not None
+    count = db.query(Like).filter(Like.post_id == post_id).count()
+    return LikeOut(post_id=post_id, liked=liked, count=count)

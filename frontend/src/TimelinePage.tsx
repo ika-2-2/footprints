@@ -24,8 +24,37 @@ export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; on
     const data = await res.json();
     setTimeline(data);
   };
+  
 
-  useEffect(() => { fetchTimeline(); }, []);
+  const unlockNearby = () => {
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const { latitude, longitude } = pos.coords;
+
+      // 近くの未解放投稿を取得
+      const res = await fetch(
+        `${API}/posts/nearby?lat=${latitude}&lng=${longitude}&user_id=${login.user_id}`
+      );
+      const nearby: Post[] = await res.json();
+
+      // 全部unlock
+      await Promise.all(
+        nearby.map((post) =>
+          fetch(`${API}/posts/${post.id}/unlock`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ user_id: login.user_id, lat: latitude, lng: longitude }),
+          })
+        )
+      );
+
+      // TL更新
+      fetchTimeline();
+    });
+  };
+
+  useEffect(() => {
+    unlockNearby(); // 近くの投稿を解放してからTL取得
+  }, []);
 
   return (
     <div className="container">
@@ -49,11 +78,25 @@ export default function TimelinePage({ login, onGoPost }: { login: LoginInfo; on
 
       {/* 下メニューバー */}
       <nav className="bottom-nav">
-        <button className="nav-item active">🏠<span>TL</span></button>
-        <button className="nav-item">🔍<span>検索</span></button>
-        <button className="nav-item post-btn" onClick={onGoPost}>＋</button>
-        <button className="nav-item">🔔<span>通知</span></button>
-        <button className="nav-item">👤<span>マイページ</span></button>
+        <button className="nav-item active" onClick={unlockNearby}>
+          <i className="fa-solid fa-house"></i>
+          <span>TL</span>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-magnifying-glass"></i>
+          <span>検索</span>
+        </button>
+        <button className="nav-item post-btn" onClick={onGoPost}>
+          <i className="fa-solid fa-plus"></i>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-bell"></i>
+          <span>通知</span>
+        </button>
+        <button className="nav-item">
+          <i className="fa-solid fa-user"></i>
+          <span>マイページ</span>
+        </button>
       </nav>
     </div>
   );

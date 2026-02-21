@@ -126,6 +126,22 @@ def get_unlocked_posts(user_id: int, db: Session = Depends(get_db)):
     return posts
 
 
+# 解放済みの投稿をTLに表示
+@app.get("/posts/nearby", response_model=list[PostOut])
+def get_nearby_posts(lat: float, lng: float, user_id: int, db: Session = Depends(get_db)):
+    # 解放済みのpost_idを取得
+    unlocked_ids = db.query(UnlockedPost.post_id).filter(
+        UnlockedPost.user_id == user_id
+    ).subquery()
+
+    # 未解放の投稿を全取得
+    posts = db.query(Post).filter(Post.id.notin_(unlocked_ids)).all()
+
+    # 50m以内のものだけ返す
+    nearby = [p for p in posts if haversine(lat, lng, p.lat, p.lng) <= 50]
+    return nearby
+
+
 # 
 @app.get("/posts/{post_id}", response_model=PostOut)
 def read_post(post_id: int, db: Session = Depends(get_db)):
@@ -142,3 +158,4 @@ def get_timeline(user_id: int, db: Session = Depends(get_db)):
     ).subquery()
     posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
     return posts
+

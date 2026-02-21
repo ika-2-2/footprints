@@ -86,7 +86,9 @@
 
 .nav-item span { font-size: 0.7rem; }
 .nav-item.active { color: #1a1a2e; }
+.nav-item.active i { color: #1a1a2e; }
 .nav-item:hover { background: none; opacity: 0.7; }
+.nav-item i { color: #aaa; }
 
 .post-btn {
   width: 48px;

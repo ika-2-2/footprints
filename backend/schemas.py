@@ -42,3 +42,18 @@ class LoginRequest(BaseModel):
 class LoginOut(BaseModel):
     user_id: int
     username: str
+
+class CommentOut(BaseModel):
+    id: int
+    post_id: int
+    user_id: int
+    body: str
+    created_at: datetime
+    username: str = ""
+
+    class Config:
+        from_attributes = True
+
+class CommentCreate(BaseModel):
+    user_id: int
+    body: str = Field(..., min_length=1, max_length=500) #文字数制限

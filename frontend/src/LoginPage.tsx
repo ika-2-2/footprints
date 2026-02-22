@@ -14,6 +14,11 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [loginError, setLoginError] = useState("");
+  const [regUsername, setRegUsername] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regUsernameError, setRegUsernameError] = useState("");
+  const [regPasswordError, setRegPasswordError] = useState("");
+  const [regError, setRegError] = useState("");
 
   const validateUsername = (val: string) => !val ? "ユーザー名を入力してください" : "";
   const validatePassword = (val: string) => {
@@ -22,6 +27,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
     return "";
   };
 
+  // ログイン
   const handleLogin = async () => {
     const uErr = validateUsername(username);
     const pErr = validatePassword(password);
@@ -42,6 +48,28 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
     onLogin({ user_id: data.user_id, username: data.username });
   };
 
+  // 新規登録
+  const handleRegister = async () => {
+    const uErr = validateUsername(regUsername);
+    const pErr = validatePassword(regPassword);
+    setRegUsernameError(uErr);
+    setRegPasswordError(pErr);
+    if (uErr || pErr) return;
+
+    const res = await fetch(`${API}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: regUsername, password: regPassword }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      setRegError(data.detail ?? "登録に失敗しました");
+      return;
+    }
+    const data = await res.json();
+    onLogin({ user_id: data.user_id, username: data.username });
+  };
+
   return (
     <div className="login-wrapper">
       <div className="login-card">
@@ -54,8 +82,42 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
         </div>
 
         {tab === "register" ? (
-          <p className="register-placeholder">新規登録は現在準備中です。</p>
+          <>
+            <div className="field-group">
+              <label>👤 ユーザー名</label>
+              <input
+                type="text"
+                placeholder="username"
+                value={regUsername}
+                onChange={(e) => { setRegUsername(e.target.value); setRegError(""); }}
+                onBlur={() => setRegUsernameError(validateUsername(regUsername))}
+              />
+              {regUsernameError && <p className="field-error">⚠ {regUsernameError}</p>}
+            </div>
+
+            <div className="field-group">
+              <label>🔒 パスワード</label>
+              <div className="password-row">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="パスワードを入力"
+                  value={regPassword}
+                  onChange={(e) => { setRegPassword(e.target.value); setRegError(""); }}
+                  onBlur={() => setRegPasswordError(validatePassword(regPassword))}
+                />
+                <button type="button" className="toggle-pw" onClick={() => setShowPassword(v => !v)}>
+                  {showPassword ? "🙈" : "👁"}
+                </button>
+              </div>
+              <p className="field-hint">半角英数字・8文字以上</p>
+              {regPasswordError && <p className="field-error">⚠ {regPasswordError}</p>}
+            </div>
+
+            {regError && <p className="login-error">⚠ {regError}</p>}
+            <button className="login-btn" onClick={handleRegister}>新規登録</button>
+          </>
         ) : (
+          // 既存のログインフォーム
           <>
             <div className="field-group">
               <label>👤 ユーザー名</label>

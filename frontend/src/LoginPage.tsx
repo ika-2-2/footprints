@@ -23,7 +23,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
   const validateUsername = (val: string) => !val ? "ユーザー名を入力してください" : "";
   const validatePassword = (val: string) => {
     if (!val) return "パスワードを入力してください";
-    if (val.length < 8) return "パスワードは8文字以上で入力してください";
+    if (val.length < 4) return "パスワードは4文字以上で入力してください";
     return "";
   };
 
@@ -109,7 +109,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
                   {showPassword ? "🙈" : "👁"}
                 </button>
               </div>
-              <p className="field-hint">半角英数字・8文字以上</p>
+              <p className="field-hint">半角英数字・4文字以上</p>
               {regPasswordError && <p className="field-error">⚠ {regPasswordError}</p>}
             </div>
 
@@ -146,7 +146,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
                   {showPassword ? "🙈" : "👁"}
                 </button>
               </div>
-              <p className="field-hint">半角英数字・8文字以上</p>
+              <p className="field-hint">半角英数字・4文字以上</p>
               {passwordError && <p className="field-error">⚠ {passwordError}</p>}
             </div>
 

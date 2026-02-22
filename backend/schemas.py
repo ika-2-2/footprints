@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
+# 新規登録
 class RegisterRequests(BaseModel):
     username: str
     password: str = Field(..., min_length=4, max_length=100) #パスワード文字数設定
@@ -58,10 +59,12 @@ class CommentOut(BaseModel):
     class Config:
         from_attributes = True
 
+# コメント
 class CommentCreate(BaseModel):
     user_id: int
     body: str = Field(..., min_length=1, max_length=500) #文字数制限
 
+# いいね
 class LikeOut(BaseModel):
     post_id: int
     liked: bool

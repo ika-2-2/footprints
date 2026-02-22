@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
 from models import Post, UnlockedPost, User, Comment, Like
-from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut
+from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests
 
 app = FastAPI()
 
@@ -55,6 +55,18 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="ユーザー名またはパスワードが違います")
     return LoginOut(user_id=user.id, username=user.username)
 
+@app.post("/register", response_model=LoginOut)
+def register(payload: RegisterRequests, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(
+        User.username == payload.username
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="このユーザー名は既に使われています")
+    user = User(username=payload.username, password=payload.password)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return LoginOut(user_id=user.id, username=user.username)
 
 # 投稿作成
 @app.post("/posts", response_model=PostOut)

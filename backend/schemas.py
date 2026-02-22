@@ -2,6 +2,10 @@ from pydantic import BaseModel, Field
 from datetime import datetime
 
 
+class RegisterRequests(BaseModel):
+    username: str
+    password: str = Field(..., min_length=4, max_length=100) #パスワード文字数設定
+
 # クライアント→サーバー
 class PostCreate(BaseModel):
     user_id: int = Field(..., ge=1)

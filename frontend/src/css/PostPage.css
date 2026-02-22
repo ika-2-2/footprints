@@ -46,3 +46,14 @@
 }
 
 .star.on { color: #f5a623; }
+
+.char-count {
+  font-size: 0.78rem;
+  color: #aaa;
+  text-align: right;
+}
+
+.char-count.over {
+  color: #e74c3c;
+  font-weight: 700;
+}

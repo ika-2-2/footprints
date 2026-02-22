@@ -13,6 +13,9 @@ export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: 
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
 
+  // 本文の文字数設定
+  const MAX_LENGTH = 1000;
+
   const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -100,7 +103,12 @@ export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: 
             onChange={(e) => setBody(e.target.value)}
             placeholder="この場所について..."
             rows={4}
+            maxLength={MAX_LENGTH}
           />
+          {/* 本文の文字数を表示 (〇〇/1000) */}
+          <p className={`char-count ${body.length >= MAX_LENGTH ? "over" : ""}`}>
+            {body.length} / {MAX_LENGTH}
+          </p>
         </div>
 
         {error && <p className="field-error">⚠ {error}</p>}

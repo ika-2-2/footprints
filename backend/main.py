@@ -292,7 +292,7 @@ def get_user_posts(user_id: int, db: Session = Depends(get_db)):
     posts = db.query(Post).filter(Post.user_id == user_id).order_by(Post.created_at.desc()).all()
     return posts
 
-# マイページ(いいね投稿取得)
+# マイページ(いいね投稿取得) 
 @app.get("/users/{user_id}/likes", response_model=list[PostOut])
 def get_user_likes(user_id: int, db: Session = Depends(get_db)):
     liked_ids = db.query(Like.post_id).filter(Like.user_id == user_id).subquery()

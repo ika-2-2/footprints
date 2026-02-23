@@ -4,7 +4,7 @@ import  BottomNav  from "./BottomNav"
 import "./css/common.css";
 import "./css/PostDetailPage.css";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 type Comment = {
   id: number;

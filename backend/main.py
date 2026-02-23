@@ -13,7 +13,7 @@ from models import Base, Post, UnlockedPost, User, Comment, Like
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests, UserOut
 
 BASE_DIR = Path(__file__).resolve().parent
-UPLOAD_DIR = BASE_DIR / "uploads"
+UPLOAD_DIR = BASE_DIR / "uploads" 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = FastAPI()

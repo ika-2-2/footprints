@@ -4,7 +4,7 @@ import BottomNav from "./BottomNav";
 import "./css/common.css";
 import "./css/ProfilePage.css";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 type UserProfile = {
   id: number;

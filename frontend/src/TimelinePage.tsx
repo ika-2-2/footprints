@@ -4,7 +4,7 @@ import BottomNav from "./BottomNav";
 import "./css/common.css";
 import "./css/TimelinePage.css";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}: { 
   login: LoginInfo; 

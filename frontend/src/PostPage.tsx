@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { LoginInfo } from "./App";
 import "./css/PostPage.css";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_BASE_URL;
 
 export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: () => void }) {
   const [body, setBody] = useState("");

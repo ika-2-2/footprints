@@ -3,19 +3,22 @@ import os, shutil
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from db import test_connection, get_db
+from db import test_connection, get_db, engine
 from geocoding import get_place_name
-from models import Post, UnlockedPost, User, Comment, Like
+from models import Base, Post, UnlockedPost, User, Comment, Like
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests, UserOut
 
-
-UPLOAD_DIR = "uploads"
+BASE_DIR = Path(__file__).resolve().parent
+UPLOAD_DIR = BASE_DIR / "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app = FastAPI()
+Base.metadata.create_all(bind=engine)
+
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 

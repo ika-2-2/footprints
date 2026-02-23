@@ -66,7 +66,7 @@ export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}
           </div>
         ) : (
           timeline.map((post) => (
-            <PostCard key={post.id} post={post} onClick={() => onGoDetail(post)} />
+            <PostCard key={post.id} post={post} onClick={() => onGoDetail(post)} userId={login.user_id} />
           ))
         )}
       </div>
@@ -77,22 +77,35 @@ export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}
   );
 }
 
-function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
+function PostCard({ post, onClick, userId }: { post: Post; onClick: () => void; userId: number }) {
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+
+  useEffect(() => {
+    fetch(`${API}/posts/${post.id}/like?user_id=${userId}`)
+      .then(r => r.json())
+      .then(data => { setLiked(data.liked); setLikeCount(data.count); });
+  }, []);
+
+  const handleLike = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // カードのonClickが発火しないように
+    const res = await fetch(`${API}/posts/${post.id}/like?user_id=${userId}`, { method: "POST" });
+    const data = await res.json();
+    setLiked(data.liked);
+    setLikeCount(data.count);
+  };
+
   const date = new Date(post.created_at).toLocaleDateString("ja-JP", {
     month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit",
   });
 
   return (
-    <div className="post-card" onClick={onClick} style={{cursor: "pointer"}}>
+    <div className="post-card" onClick={onClick} style={{ cursor: "pointer" }}>
       <div className="post-card-header">
         <div className="avatar" />
         <span className="post-username">user:{post.user_id}</span>
       </div>
-      <img
-        src={`${API}/uploads/${post.image_path}`}
-        alt={post.place_name}
-        className="post-image"
-      />
+      <img src={`${API}/uploads/${post.image_path}`} alt={post.place_name} className="post-image" />
       <div className="post-card-body">
         <div className="post-meta">
           <span className="post-place">
@@ -107,10 +120,16 @@ function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
           </span>
           <span className="post-date">{date}</span>
         </div>
-        <div className="post-stars">
-          {[1,2,3,4,5].map((s) => (
-            <span key={s} className={s <= post.rating ? "star on" : "star"}>★</span>
-          ))}
+        <div className="tl-card-bottom">
+          <div className="post-stars">
+            {[1,2,3,4,5].map((s) => (
+              <span key={s} className={s <= post.rating ? "star on" : "star"}>★</span>
+            ))}
+          </div>
+          <button className={`action-btn ${liked ? "liked" : ""}`} onClick={handleLike}>
+            <i className={liked ? "fa-solid fa-heart" : "fa-regular fa-heart"}></i>
+            {likeCount > 0 && <span>{likeCount}</span>}
+          </button>
         </div>
         <p className="post-body">{post.body}</p>
       </div>

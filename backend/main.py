@@ -11,12 +11,14 @@ from geocoding import get_place_name
 from models import Post, UnlockedPost, User, Comment, Like
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests, UserOut
 
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 app = FastAPI()
 
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
-UPLOAD_DIR = "uploads"
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 app.add_middleware(
     CORSMiddleware,

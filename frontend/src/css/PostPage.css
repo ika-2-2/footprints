@@ -46,3 +46,15 @@
 }
 
 .star.on { color: #f5a623; }
+
+.char-count {
+  font-size: 0.78rem;
+  color: #aaa;
+  text-align: right;
+}
+
+/* 文字数が上限に達したら赤く表示 */
+.char-count.over {
+  color: #e74c3c;
+  font-weight: 700;
+}

@@ -94,7 +94,16 @@ function PostCard({ post, onClick }: { post: Post; onClick: () => void }) {
       />
       <div className="post-card-body">
         <div className="post-meta">
-          <span className="post-place">📍 {post.place_name}</span>
+          <span className="post-place">
+            {post.place_name.includes("\n") ? (
+              <>
+                <span className="post-place-main">{post.place_name.split("\n")[0]}</span>
+                <span className="post-place-area">{post.place_name.split("\n")[1]}</span>
+              </>
+            ) : (
+              <span className="post-place-main">{post.place_name}</span>
+            )}
+          </span>
           <span className="post-date">{date}</span>
         </div>
         <div className="post-stars">

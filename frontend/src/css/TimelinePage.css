@@ -55,7 +55,12 @@
 .post-stars { display: flex; gap: 2px; }
 .star { font-size: 1rem; color: #ddd; }
 .star.on { color: #f5a623; }
-.post-body { font-size: 0.95rem; line-height: 1.6; color: #333; }
+.post-body { 
+  font-size: 0.95rem; 
+  line-height: 1.6; 
+  color: #333; 
+  white-space: pre-wrap;
+}
 
 .bottom-nav {
   position: fixed;

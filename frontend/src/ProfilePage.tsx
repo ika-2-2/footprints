@@ -13,11 +13,12 @@ type UserProfile = {
   banner_path: string | null;
 };
 
-export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail }: {
+export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail, onLogout }: {
   login: LoginInfo;
   onGoPost: () => void;
   onGoTimeline: () => void;
   onGoDetail: (post: Post) => void;
+  onLogout: () => void;
 }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -89,7 +90,10 @@ export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail 
           <input ref={iconInputRef} type="file" accept="image/*" onChange={handleIconUpload} style={{ display: "none" }} />
         </div>
         <div className="profile-meta">
-          <span className="profile-username">{login.username}</span>
+          <div className="profile-name-row">
+            <span className="profile-username">{login.username}</span>
+            <button className="logout-btn" onClick={onLogout}>ログアウト</button>
+          </div>
           <div className="profile-follow-row">
             <span className="follow-count"><b>0</b> フォロー中</span>
             <span className="follow-count"><b>0</b> フォロワー</span>

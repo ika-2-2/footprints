@@ -184,7 +184,13 @@ def get_timeline(user_id: int, db: Session = Depends(get_db)):
         UnlockedPost.user_id == user_id
     ).subquery()
     posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
-    return posts
+    result = []
+    for p in posts:
+        out = PostOut.model_validate(p)
+        out.username = p.user.username
+        out.icon_path = p.user.icon_path
+        result.append(out)
+    return result
 
 # コメント取得
 @app.get("/posts/{post_id}/comments", response_model=list[CommentOut])
@@ -295,11 +301,23 @@ def upload_banner(user_id: int, image: UploadFile = File(...), db: Session = Dep
 @app.get("/users/{user_id}/posts", response_model=list[PostOut])
 def get_user_posts(user_id: int, db: Session = Depends(get_db)):
     posts = db.query(Post).filter(Post.user_id == user_id).order_by(Post.created_at.desc()).all()
-    return posts
+    result = []
+    for p in posts:
+        out = PostOut.model_validate(p)
+        out.username = p.user.username
+        out.icon_path = p.user.icon_path
+        result.append(out)
+    return result
 
 # マイページ(いいね投稿取得) 
 @app.get("/users/{user_id}/likes", response_model=list[PostOut])
 def get_user_likes(user_id: int, db: Session = Depends(get_db)):
     liked_ids = db.query(Like.post_id).filter(Like.user_id == user_id).subquery()
     posts = db.query(Post).filter(Post.id.in_(liked_ids)).order_by(Post.created_at.desc()).all()
-    return posts
+    result = []
+    for p in posts:
+        out = PostOut.model_validate(p)
+        out.username = p.user.username
+        out.icon_path = p.user.icon_path
+        result.append(out)
+    return result

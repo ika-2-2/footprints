@@ -48,7 +48,8 @@ function App() {
       onGoPost={() => setScreen("post")}
       onGoTimeline={() => setScreen("timeline")}
       onGoDetail={(post) => { setSelectedPost(post); setScreen("detail"); }}
-    />;
+      onLogout={() => { setLogin(null); setScreen("timeline"); }}
+    />
   }
   return (
     <TimelinePage

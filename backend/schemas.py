@@ -31,6 +31,8 @@ class PostCreate(BaseModel):
 class PostOut(BaseModel):
     id: int
     user_id: int
+    username: str = ""
+    icon_path: Optional[str] = None
     body: str
     lat: float
     lng: float

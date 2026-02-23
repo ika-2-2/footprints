@@ -3,9 +3,11 @@ import os, shutil
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from db import test_connection, get_db
+from geocoding import get_place_name
 from models import Post, UnlockedPost, User, Comment, Like
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests
 
@@ -75,11 +77,13 @@ def create_post(
     body: str = Form(...),
     lat: float = Form(...),
     lng: float = Form(...),
-    place_name: str = Form(...),
     rating: int = Form(...),
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
+    # place_nameはサーバー側で自動取得
+    place_name = get_place_name(lat, lng)
+
     ext = os.path.splitext(image.filename)[1]
     filename = f"{user_id}_{int(__import__('time').time())}{ext}"
     filepath = os.path.join(UPLOAD_DIR, filename)
@@ -124,7 +128,11 @@ def unlock_post(post_id: int, payload: UnlockRequest, db: Session = Depends(get_
     # 開放範囲以内 → INSERT
     record = UnlockedPost(user_id=payload.user_id, post_id=post_id)
     db.add(record)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        # 既に解放済みなので正常扱い
     return UnlockOut(already_unlocked=False, unlocked=True, distance_m=round(dist, 2))
 
 

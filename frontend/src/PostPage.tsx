@@ -6,7 +6,6 @@ const API = "http://localhost:8000";
 
 export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: () => void }) {
   const [body, setBody] = useState("");
-  const [placeName, setPlaceName] = useState("");
   const [rating, setRating] = useState(0);
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -25,7 +24,6 @@ export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: 
 
   const handlePost = () => {
     if (!body.trim()) { setError("本文を入力してください"); return; }
-    if (!placeName.trim()) { setError("場所名を入力してください"); return; }
     if (!image) { setError("画像を選択してください"); return; }
     if (rating === 0) { setError("評価を選択してください"); return; }
     setError("");
@@ -36,7 +34,6 @@ export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: 
       form.append("body", body);
       form.append("lat", String(pos.coords.latitude));
       form.append("lng", String(pos.coords.longitude));
-      form.append("place_name", placeName);
       form.append("rating", String(rating));
       form.append("image", image);
 
@@ -68,17 +65,6 @@ export default function PostPage({ login, onBack }: { login: LoginInfo; onBack: 
             }
             <input type="file" accept="image/*" onChange={handleImage} style={{ display: "none" }} />
           </label>
-        </div>
-
-        {/* 場所名 */}
-        <div className="field-group">
-          <label>📍 場所名 *</label>
-          <input
-            type="text"
-            placeholder="例: 名城公園"
-            value={placeName}
-            onChange={(e) => setPlaceName(e.target.value)}
-          />
         </div>
 
         {/* 評価 */}

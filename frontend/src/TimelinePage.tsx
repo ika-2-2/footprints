@@ -6,10 +6,11 @@ import "./css/TimelinePage.css";
 
 const API = "http://localhost:8000";
 
-export default function TimelinePage({ login, onGoPost, onGoDetail}: { 
+export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}: { 
   login: LoginInfo; 
   onGoPost: () => void;
   onGoDetail: (post: Post) => void;
+  onGoProfile?: () => void;
 }) {
   const [timeline, setTimeline] = useState<Post[]>([]);
 
@@ -53,7 +54,7 @@ export default function TimelinePage({ login, onGoPost, onGoDetail}: {
   return (
     <div className="container">
       <header>
-        <span className="header-logo">Footprints</span>
+        <span className="header-logo">footprints</span>
         <span className="username">{login.username}</span>
       </header>
 
@@ -71,7 +72,7 @@ export default function TimelinePage({ login, onGoPost, onGoDetail}: {
       </div>
 
       {/* 下メニューバー */}
-      <BottomNav active="timeline" onGoTimeline={unlockNearby} onGoPost={onGoPost} />
+      <BottomNav active="timeline" onGoTimeline={unlockNearby} onGoPost={onGoPost} onGoProfile={onGoProfile} />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 from sqlalchemy import BigInteger, DateTime, Double, ForeignKey, Text, String, SmallInteger, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import Optional
 from db import Base
 from datetime import datetime
 
@@ -9,6 +10,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False, default="")
+    icon_path: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    banner_path: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     created_at: Mapped[str] = mapped_column(DateTime, server_default=func.current_timestamp())
 
 class Post(Base):

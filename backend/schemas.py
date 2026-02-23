@@ -1,11 +1,23 @@
-from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Optional
+from pydantic import BaseModel, Field
 
 
 # 新規登録
 class RegisterRequests(BaseModel):
     username: str
     password: str = Field(..., min_length=4, max_length=100) #パスワード文字数設定
+
+
+class UserOut(BaseModel):
+    id: int
+    username: Optional[str]
+    icon_path: Optional[str]
+    banner_path: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
 
 # クライアント→サーバー
 class PostCreate(BaseModel):

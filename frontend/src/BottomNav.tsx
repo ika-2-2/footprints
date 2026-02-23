@@ -4,9 +4,10 @@ type Props = {
   active: "timeline" | "post" | "detail" | "search" | "notify" | "mypage";
   onGoTimeline: () => void;
   onGoPost: () => void;
+  onGoProfile?: () => void;
 };
 
-export default function BottomNav({ active, onGoTimeline, onGoPost }: Props) {
+export default function BottomNav({ active, onGoTimeline, onGoPost, onGoProfile}: Props) {
   return (
     <nav className="bottom-nav">
       <button className={`nav-item ${active === "timeline" ? "active" : ""}`} onClick={onGoTimeline}>
@@ -21,7 +22,7 @@ export default function BottomNav({ active, onGoTimeline, onGoPost }: Props) {
       <button className="nav-item">
         <i className="fa-solid fa-bell"></i><span>通知</span>
       </button>
-      <button className="nav-item">
+      <button className={`nav-item ${active === "mypage" ? "active" : ""}`} onClick={onGoProfile}>
         <i className="fa-solid fa-user"></i><span>マイページ</span>
       </button>
     </nav>

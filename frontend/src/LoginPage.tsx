@@ -5,6 +5,9 @@ import "./css/common.css";
 import "./css/LoginPage.css";
 
 const API = import.meta.env.VITE_API_BASE_URL;
+if (!API) {
+  throw new Error("VITE_API_BASE_URL is missing");
+}
 
 export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => void }) {
   const [tab, setTab] = useState<"login" | "register">("login");

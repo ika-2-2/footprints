@@ -14,11 +14,12 @@ type Comment = {
   created_at: string;
 };
 
-export default function PostDetailPage({ login, post, onBack, onGoPost }: {
+export default function PostDetailPage({ login, post, onBack, onGoPost, onGoProfile }: {
   login: LoginInfo;
   post: Post;
   onBack: () => void;
   onGoPost: () => void;
+  onGoProfile?: () => void;
 }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [body, setBody] = useState("");
@@ -150,7 +151,7 @@ export default function PostDetailPage({ login, post, onBack, onGoPost }: {
 
       {error && <p className="field-error" style={{ padding: "0 16px" }}>⚠ {error}</p>}
 
-      <BottomNav active="detail" onGoTimeline={onBack} onGoPost={onGoPost} />
+      <BottomNav active="detail" onGoTimeline={onBack} onGoPost={onGoPost} onGoProfile={onGoProfile} />
     </div>
   );
 }

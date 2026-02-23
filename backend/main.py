@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from db import test_connection, get_db
 from geocoding import get_place_name
 from models import Post, UnlockedPost, User, Comment, Like
-from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests
+from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests, UserOut
 
 app = FastAPI()
 
@@ -26,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# 距離測定
 def haversine(lat1, lng1, lat2, lng2) -> float:
     """2点間の距離をメートルで返す"""
     # ハバースイン距離計算
@@ -46,7 +47,7 @@ def on_startup():
 def root():
     return {"ok": True}
 
-
+# ログイン
 @app.post("/login", response_model=LoginOut)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(
@@ -57,6 +58,7 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=401, detail="ユーザー名またはパスワードが違います")
     return LoginOut(user_id=user.id, username=user.username)
 
+# 新規登録
 @app.post("/register", response_model=LoginOut)
 def register(payload: RegisterRequests, db: Session = Depends(get_db)):
     existing = db.query(User).filter(
@@ -136,7 +138,7 @@ def unlock_post(post_id: int, payload: UnlockRequest, db: Session = Depends(get_
     return UnlockOut(already_unlocked=False, unlocked=True, distance_m=round(dist, 2))
 
 
-# 
+# *
 @app.get("/posts/unlocked", response_model=list[PostOut])
 def get_unlocked_posts(user_id: int, db: Session = Depends(get_db)):
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
@@ -162,7 +164,7 @@ def get_nearby_posts(lat: float, lng: float, user_id: int, db: Session = Depends
     return nearby
 
 
-# 
+# *
 @app.get("/posts/{post_id}", response_model=PostOut)
 def read_post(post_id: int, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -170,7 +172,7 @@ def read_post(post_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Post not found")
     return post
 
-
+# TL
 @app.get("/timeline", response_model=list[PostOut])
 def get_timeline(user_id: int, db: Session = Depends(get_db)):
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
@@ -179,7 +181,7 @@ def get_timeline(user_id: int, db: Session = Depends(get_db)):
     posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
     return posts
 
-
+# コメント取得
 @app.get("/posts/{post_id}/comments", response_model=list[CommentOut])
 def get_comments(post_id: int, db: Session = Depends(get_db)):
     comments = db.query(Comment).filter(Comment.post_id == post_id).order_by(Comment.created_at).all()
@@ -195,7 +197,7 @@ def get_comments(post_id: int, db: Session = Depends(get_db)):
         ))
     return result
 
-
+# コメント投稿
 @app.post("/posts/{post_id}/comments", response_model=CommentOut)
 def create_comment(post_id: int, payload: CommentCreate, db: Session = Depends(get_db)):
     post = db.query(Post).filter(Post.id == post_id).first()
@@ -214,7 +216,7 @@ def create_comment(post_id: int, payload: CommentCreate, db: Session = Depends(g
         username=comment.user.username,
     )
 
-
+# いいね
 @app.post("/posts/{post_id}/like", response_model=LikeOut)
 def toggle_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
     existing = db.query(Like).filter(
@@ -234,7 +236,7 @@ def toggle_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
     count = db.query(Like).filter(Like.post_id == post_id).count()
     return LikeOut(post_id=post_id, liked=liked, count=count)
 
-
+# いいね(取得)
 @app.get("/posts/{post_id}/like", response_model=LikeOut)
 def get_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
     liked = db.query(Like).filter(
@@ -243,3 +245,56 @@ def get_like(post_id: int, user_id: int, db: Session = Depends(get_db)):
     ).first() is not None
     count = db.query(Like).filter(Like.post_id == post_id).count()
     return LikeOut(post_id=post_id, liked=liked, count=count)
+
+# マイページ
+@app.get("/users/{user_id}", response_model=UserOut)
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+# マイページ(アイコン設定)
+@app.post("/users/{user_id}/icon", response_model=UserOut)
+def upload_icon(user_id: int, image: UploadFile = File(...), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    ext = os.path.splitext(image.filename)[1]
+    filename = f"icon_{user_id}{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as f:
+        shutil.copyfileobj(image.file, f)
+    user.icon_path = filename
+    db.commit()
+    db.refresh(user)
+    return user
+
+# マイページ(バナー設定)
+@app.post("/users/{user_id}/banner", response_model=UserOut)
+def upload_banner(user_id: int, image: UploadFile = File(...), db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    ext = os.path.splitext(image.filename)[1]
+    filename = f"banner_{user_id}{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+    with open(filepath, "wb") as f:
+        shutil.copyfileobj(image.file, f)
+    user.banner_path = filename
+    db.commit()
+    db.refresh(user)
+    return user
+
+# マイページ(投稿取得)
+@app.get("/users/{user_id}/posts", response_model=list[PostOut])
+def get_user_posts(user_id: int, db: Session = Depends(get_db)):
+    posts = db.query(Post).filter(Post.user_id == user_id).order_by(Post.created_at.desc()).all()
+    return posts
+
+# マイページ(いいね投稿取得)
+@app.get("/users/{user_id}/likes", response_model=list[PostOut])
+def get_user_likes(user_id: int, db: Session = Depends(get_db)):
+    liked_ids = db.query(Like.post_id).filter(Like.user_id == user_id).subquery()
+    posts = db.query(Post).filter(Post.id.in_(liked_ids)).order_by(Post.created_at.desc()).all()
+    return posts

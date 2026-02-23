@@ -15,7 +15,7 @@ mysql_url = os.getenv("MYSQL_URL")
 if not mysql_url:
     raise RuntimeError("MYSQL_URL is not set in environment variables (Railway Variables).")
 
-if mysql_url:
+if mysql_url: 
     DATABASE_URL = mysql_url.replace("mysql://", "mysql+pymysql://", 1)
 else:
     DB_HOST = os.getenv("DB_HOST")

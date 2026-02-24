@@ -6,6 +6,8 @@ import TimelinePage from "./TimelinePage";
 import PostPage from "./PostPage";
 import PostDetailPage from "./PostDetailPage";
 import ProfilePage from "./ProfilePage";
+import SearchPage from "./SearchPage";
+import NotifyPage from "./NotifyPage";
 
 export type LoginInfo = {
   user_id: number;
@@ -26,7 +28,7 @@ export type Post = {
   created_at: string;
 };
 
-type Screen = "timeline" | "post" | "detail" | "profile";
+type Screen = "timeline" | "search" | "post" | "detail" | "notify" | "profile";
 
 function App() {
   const [login, setLogin] = useState<LoginInfo | null>(null);
@@ -34,6 +36,14 @@ function App() {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   if (!login) return <LoginPage onLogin={setLogin} />;
+  if (screen === "search") {
+    return <SearchPage
+      login={login}
+      onGoTimeline={() => setScreen("timeline")}
+      onGoPost={() => setScreen("post")}
+      onGoProfile={() => setScreen("profile")}
+    />;
+  }
   if (screen === "post") return <PostPage login={login} onBack={() => setScreen("timeline")} />;
   if (screen === "detail" && selectedPost) {
     return <PostDetailPage 
@@ -42,6 +52,14 @@ function App() {
       onBack={() => setScreen("timeline")} 
       onGoPost={() => setScreen("post")}
       onGoProfile={() => setScreen("profile")} 
+    />;
+  }
+  if (screen === "notify") {
+    return <NotifyPage
+      login={login}
+      onGoTimeline={() => setScreen("timeline")}
+      onGoPost={() => setScreen("post")}
+      onGoProfile={() => setScreen("profile")}
     />;
   }
   if (screen === "profile") {

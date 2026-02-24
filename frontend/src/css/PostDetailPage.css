@@ -1,6 +1,10 @@
 .detail-post {
   border-bottom: 8px solid #f0f0f0;
 }
+.detail-post .post-body {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
 
 .detail-meta-row {
   display: flex;

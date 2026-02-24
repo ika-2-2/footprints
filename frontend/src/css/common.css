@@ -141,11 +141,15 @@ textarea:focus { outline: none; border-color: #1a1a2e; }
   display: flex; 
   gap: 2px; 
 }
-.post-body { 
-  font-size: 0.95rem; 
-  line-height: 1.6; 
-  color: #333; 
+.post-body {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #333;
   white-space: pre-wrap;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /*3行以上なら...*/
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 /* メニューバー */

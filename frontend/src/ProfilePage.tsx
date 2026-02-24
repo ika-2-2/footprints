@@ -84,7 +84,7 @@ export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail,
         <div className="profile-info">
           <div className="profile-icon-wrap" onClick={() => iconInputRef.current?.click()}>
             {profile?.icon_path
-              ? <img src={`${API}/uploads/${profile.icon_path}`} alt="icon" className="profile-icon" />
+              ? <img src={profile.icon_path} alt="icon" className="profile-icon" />
               : <div className="profile-icon-placeholder"><i className="fa-solid fa-user"></i></div>
             }
             <div className="icon-edit-badge"><i className="fa-solid fa-camera"></i></div>
@@ -120,7 +120,7 @@ export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail,
         ) : (
           displayPosts.map((post) => (
             <div key={post.id} className="grid-item" onClick={() => onGoDetail(post)}>
-              <img src={`${API}/uploads/${post.image_path}`} alt={post.place_name} />
+              <img src={post.image_path} alt={post.place_name} />
             </div>
           ))
         )}

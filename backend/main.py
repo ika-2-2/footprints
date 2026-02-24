@@ -12,6 +12,7 @@ from sqlalchemy.orm import Session
 from db import test_connection, get_db, engine
 from geocoding import get_place_name
 from models import Base, Post, UnlockedPost, User, Comment, Like
+from r2 import upload_to_r2
 from schemas import PostCreate, PostOut, UnlockRequest, UnlockOut, LoginRequest, LoginOut, CommentCreate, CommentOut, LikeOut, RegisterRequests, UserOut
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -92,7 +93,6 @@ def create_post(
     image: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
-    # place_nameはサーバー側で自動取得
     place_name = get_place_name(lat, lng)
 
     ext = os.path.splitext(image.filename)[1]
@@ -101,6 +101,9 @@ def create_post(
     with open(filepath, "wb") as f:
         shutil.copyfileobj(image.file, f)
 
+    # R2にアップロード
+    r2_url = upload_to_r2(str(filepath), filename)
+
     post = Post(
         user_id=user_id,
         body=body,
@@ -108,7 +111,7 @@ def create_post(
         lng=lng,
         place_name=place_name,
         rating=rating,
-        image_path=filename,
+        image_path=r2_url,  # URLをそのまま保存
     )
     db.add(post)
     db.commit()
@@ -292,7 +295,8 @@ def upload_icon(user_id: int, image: UploadFile = File(...), db: Session = Depen
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as f:
         shutil.copyfileobj(image.file, f)
-    user.icon_path = filename
+    r2_url = upload_to_r2(str(filepath), filename)
+    user.icon_path = r2_url
     db.commit()
     db.refresh(user)
     return user
@@ -308,7 +312,8 @@ def upload_banner(user_id: int, image: UploadFile = File(...), db: Session = Dep
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as f:
         shutil.copyfileobj(image.file, f)
-    user.banner_path = filename
+    r2_url = upload_to_r2(str(filepath), filename)
+    user.banner_path = r2_url
     db.commit()
     db.refresh(user)
     return user

@@ -91,7 +91,7 @@ export default function PostDetailPage({ login, post, onBack, onGoPost, onGoProf
         </div>
 
         {/* 画像 */}
-        <img src={`${API}/uploads/${post.image_path}`} alt={post.place_name} className="post-image" />
+        <img src={post.image_path} alt={post.place_name} className="post-image" />
 
         {/* メタ情報 */}
         <div className="post-card-body">

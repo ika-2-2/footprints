@@ -108,7 +108,7 @@ function PostCard({ post, onClick, userId }: { post: Post; onClick: () => void; 
         }
         <span className="post-username">{post.username || `user:${post.user_id}`}</span>
       </div>
-      <img src={`${API}/uploads/${post.image_path}`} alt={post.place_name} className="post-image" />
+      <img src={post.image_path} alt={post.place_name} className="post-image" />
       <div className="post-card-body">
         <div className="post-meta">
           <span className="post-place">

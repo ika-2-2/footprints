@@ -103,6 +103,7 @@ def create_post(
 
     # R2にアップロード
     r2_url = upload_to_r2(str(filepath), filename)
+    os.remove(filepath)  # 一時ファイル削除
 
     post = Post(
         user_id=user_id,
@@ -118,18 +119,6 @@ def create_post(
     db.refresh(post)
     return post
 
-# 画像表示
-@app.get("/uploads/{filename}")
-def serve_image(filename: str):
-    filepath = UPLOAD_DIR / filename
-    if not filepath.exists():
-        raise HTTPException(status_code=404, detail="Image not found")
-    mime_type, _ = mimetypes.guess_type(str(filepath))
-    return FileResponse(
-        str(filepath),
-        media_type=mime_type or "image/jpeg",
-        headers={"Cache-Control": "public, max-age=86400"}
-    )
 
 # 投稿解放
 @app.post("/posts/{post_id}/unlock", response_model=UnlockOut)
@@ -295,7 +284,11 @@ def upload_icon(user_id: int, image: UploadFile = File(...), db: Session = Depen
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as f:
         shutil.copyfileobj(image.file, f)
+
+    # R2にアップロード
     r2_url = upload_to_r2(str(filepath), filename)
+    os.remove(filepath)  # 一時ファイル削除
+
     user.icon_path = r2_url
     db.commit()
     db.refresh(user)
@@ -312,7 +305,11 @@ def upload_banner(user_id: int, image: UploadFile = File(...), db: Session = Dep
     filepath = os.path.join(UPLOAD_DIR, filename)
     with open(filepath, "wb") as f:
         shutil.copyfileobj(image.file, f)
+
+    # R2にアップロード
     r2_url = upload_to_r2(str(filepath), filename)
+    os.remove(filepath)  # 一時ファイル削除
+    
     user.banner_path = r2_url
     db.commit()
     db.refresh(user)

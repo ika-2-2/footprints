@@ -83,8 +83,11 @@ export default function PostDetailPage({ login, post, onBack, onGoPost, onGoProf
       <div className="detail-post">
         {/* アバター + ユーザー名 */}
         <div className="post-card-header">
-          <div className="avatar" />
-          <span className="post-username">{post.user_id}</span>
+          {post.icon_path
+            ? <img src={`${API}/uploads/${post.icon_path}`} alt="icon" className="avatar" style={{ objectFit: "cover" }} />
+            : <div className="avatar" />
+          }
+          <span className="post-username">{post.username || `user:${post.user_id}`}</span>
         </div>
 
         {/* 画像 */}

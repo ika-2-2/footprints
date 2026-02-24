@@ -102,8 +102,11 @@ function PostCard({ post, onClick, userId }: { post: Post; onClick: () => void; 
   return (
     <div className="post-card" onClick={onClick} style={{ cursor: "pointer" }}>
       <div className="post-card-header">
-        <div className="avatar" />
-        <span className="post-username">user:{post.user_id}</span>
+        {post.icon_path
+          ? <img src={`${API}/uploads/${post.icon_path}`} alt="icon" className="avatar" style={{ objectFit: "cover" }} />
+          : <div className="avatar" />
+        }
+        <span className="post-username">{post.username || `user:${post.user_id}`}</span>
       </div>
       <img src={`${API}/uploads/${post.image_path}`} alt={post.place_name} className="post-image" />
       <div className="post-card-body">

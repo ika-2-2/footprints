@@ -15,6 +15,8 @@ export type LoginInfo = {
 export type Post = {
   id: number;
   user_id: number;
+  username: string;
+  icon_path: string | null;
   body: string;
   lat: number;
   lng: number;

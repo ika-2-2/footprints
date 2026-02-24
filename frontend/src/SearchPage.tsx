@@ -2,7 +2,7 @@ import BottomNav from "./BottomNav";
 import type { LoginInfo } from "./App";
 import "./css/common.css";
 
-export default function SearchPage({ login, onGoTimeline, onGoPost, onGoProfile }: {
+export default function SearchPage({onGoTimeline, onGoPost, onGoProfile }: {
   login: LoginInfo;
   onGoTimeline: () => void;
   onGoPost: () => void;

@@ -2,7 +2,7 @@ import BottomNav from "./BottomNav";
 import type { LoginInfo } from "./App";
 import "./css/common.css";
 
-export default function NotifyPage({ login, onGoTimeline, onGoPost, onGoProfile }: {
+export default function NotifyPage({onGoTimeline, onGoPost, onGoProfile }: {
   login: LoginInfo;
   onGoTimeline: () => void;
   onGoPost: () => void;

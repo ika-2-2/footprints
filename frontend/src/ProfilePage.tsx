@@ -80,25 +80,25 @@ export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail,
       </div>
 
       {/* アイコン + ユーザー名 */}
-      <div className="profile-info">
-        <div className="profile-icon-wrap" onClick={() => iconInputRef.current?.click()}>
-          {profile?.icon_path
-            ? <img src={`${API}/uploads/${profile.icon_path}`} alt="icon" className="profile-icon" />
-            : <div className="profile-icon-placeholder"><i className="fa-solid fa-user"></i></div>
-          }
-          <div className="icon-edit-badge"><i className="fa-solid fa-camera"></i></div>
-          <input ref={iconInputRef} type="file" accept="image/*" onChange={handleIconUpload} style={{ display: "none" }} />
-        </div>
-        <div className="profile-meta">
-          <div className="profile-name-row">
+      <div className="profile-header-row">
+        <div className="profile-info">
+          <div className="profile-icon-wrap" onClick={() => iconInputRef.current?.click()}>
+            {profile?.icon_path
+              ? <img src={`${API}/uploads/${profile.icon_path}`} alt="icon" className="profile-icon" />
+              : <div className="profile-icon-placeholder"><i className="fa-solid fa-user"></i></div>
+            }
+            <div className="icon-edit-badge"><i className="fa-solid fa-camera"></i></div>
+            <input ref={iconInputRef} type="file" accept="image/*" onChange={handleIconUpload} style={{ display: "none" }} />
+          </div>
+          <div className="profile-meta">
             <span className="profile-username">{login.username}</span>
-            <button className="logout-btn" onClick={onLogout}>ログアウト</button>
-          </div>
-          <div className="profile-follow-row">
-            <span className="follow-count"><b>0</b> フォロー中</span>
-            <span className="follow-count"><b>0</b> フォロワー</span>
+            <div className="profile-follow-row">
+              <span className="follow-count"><b>0</b> フォロー中</span>
+              <span className="follow-count"><b>0</b> フォロワー</span>
+            </div>
           </div>
         </div>
+        <button className="logout-btn" onClick={onLogout}>ログアウト</button>
       </div>
 
       {/* タブ */}

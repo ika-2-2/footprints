@@ -13,13 +13,20 @@
 .profile-banner img { width: 100%; height: 100%; object-fit: cover; }
 .banner-placeholder { color: rgba(255,255,255,0.4); font-size: 2rem; }
 
+.profile-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 16px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-top: -32px;
+}
+
+/* profile-infoからpadding/border-bottomを削除 */
 .profile-info {
   display: flex;
   align-items: flex-end;
   gap: 16px;
-  padding: 0 16px 16px;
-  border-bottom: 1px solid #f0f0f0;
-  margin-top: -20px;
 }
 
 .profile-icon-wrap {

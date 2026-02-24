@@ -73,7 +73,7 @@ export default function ProfilePage({ login, onGoPost, onGoTimeline, onGoDetail,
       {/* バナー */}
       <div className="profile-banner" onClick={() => bannerInputRef.current?.click()}>
         {profile?.banner_path
-          ? <img src={`${API}/uploads/${profile.banner_path}`} alt="banner" />
+          ? <img src={profile.banner_path} alt="banner" />
           : <div className="banner-placeholder"><i className="fa-solid fa-camera"></i></div>
         }
         <input ref={bannerInputRef} type="file" accept="image/*" onChange={handleBannerUpload} style={{ display: "none" }} />

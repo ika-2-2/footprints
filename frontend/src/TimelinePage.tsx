@@ -6,11 +6,13 @@ import "./css/TimelinePage.css";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
-export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}: { 
+export default function TimelinePage({ login, onGoPost, onGoDetail, onGoSearch, onGoNotify, onGoProfile}: { 
   login: LoginInfo; 
   onGoPost: () => void;
   onGoDetail: (post: Post) => void;
   onGoProfile?: () => void;
+  onGoSearch: () => void;
+  onGoNotify: () => void;
 }) {
   const [timeline, setTimeline] = useState<Post[]>([]);
 
@@ -72,7 +74,7 @@ export default function TimelinePage({ login, onGoPost, onGoDetail, onGoProfile}
       </div>
 
       {/* 下メニューバー */}
-      <BottomNav active="timeline" onGoTimeline={unlockNearby} onGoPost={onGoPost} onGoProfile={onGoProfile} />
+      <BottomNav active="timeline" onGoTimeline={unlockNearby} onGoPost={onGoPost} onGoSearch={onGoSearch} onGoNotify={onGoNotify} onGoProfile={onGoProfile} />
     </div>
   );
 }

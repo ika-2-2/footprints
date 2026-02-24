@@ -167,7 +167,7 @@ def get_nearby_posts(lat: float, lng: float, user_id: int, db: Session = Depends
     # 解放済みのpost_idを取得
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
         UnlockedPost.user_id == user_id
-    ).subquery()
+    ).scalar_subquery()
 
     # 未解放の投稿を全取得
     posts = db.query(Post).filter(Post.id.notin_(unlocked_ids)).all()
@@ -190,7 +190,7 @@ def read_post(post_id: int, db: Session = Depends(get_db)):
 def get_timeline(user_id: int, db: Session = Depends(get_db)):
     unlocked_ids = db.query(UnlockedPost.post_id).filter(
         UnlockedPost.user_id == user_id
-    ).subquery()
+    ).scalar_subquery()
     posts = db.query(Post).filter(Post.id.in_(unlocked_ids)).order_by(Post.created_at.desc()).all()
     result = []
     for p in posts:
@@ -330,7 +330,7 @@ def get_user_posts(user_id: int, db: Session = Depends(get_db)):
 # マイページ(いいね投稿取得) 
 @app.get("/users/{user_id}/likes", response_model=list[PostOut])
 def get_user_likes(user_id: int, db: Session = Depends(get_db)):
-    liked_ids = db.query(Like.post_id).filter(Like.user_id == user_id).subquery()
+    liked_ids = db.query(Like.post_id).filter(Like.user_id == user_id).scalar_subquery()
     posts = db.query(Post).filter(Post.id.in_(liked_ids)).order_by(Post.created_at.desc()).all()
     result = []
     for p in posts:

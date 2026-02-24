@@ -1,7 +1,9 @@
 import math
+import mimetypes
 import os, shutil
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from sqlalchemy.exc import IntegrityError
@@ -20,14 +22,13 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://footprints-1ok.pages.dev",
         "https://60780539.footprints-1ok.pages.dev",
+        "http://192.168.0.0:5173",
+        "http://localhost:5173",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -114,6 +115,18 @@ def create_post(
     db.refresh(post)
     return post
 
+# 画像表示
+@app.get("/uploads/{filename}")
+def serve_image(filename: str):
+    filepath = UPLOAD_DIR / filename
+    if not filepath.exists():
+        raise HTTPException(status_code=404, detail="Image not found")
+    mime_type, _ = mimetypes.guess_type(str(filepath))
+    return FileResponse(
+        str(filepath),
+        media_type=mime_type or "image/jpeg",
+        headers={"Cache-Control": "public, max-age=86400"}
+    )
 
 # 投稿解放
 @app.post("/posts/{post_id}/unlock", response_model=UnlockOut)

@@ -22,7 +22,6 @@
   margin-top: -32px;
 }
 
-/* profile-infoからpadding/border-bottomを削除 */
 .profile-info {
   display: flex;
   align-items: flex-end;

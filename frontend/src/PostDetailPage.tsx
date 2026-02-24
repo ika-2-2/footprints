@@ -20,6 +20,8 @@ export default function PostDetailPage({ login, post, onBack, onGoPost, onGoProf
   onBack: () => void;
   onGoPost: () => void;
   onGoProfile?: () => void;
+  onGoSearch?: () => void;
+  onGoNotify?: () => void;
 }) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [body, setBody] = useState("");

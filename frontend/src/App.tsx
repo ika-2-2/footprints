@@ -52,6 +52,8 @@ function App() {
       onBack={() => setScreen("timeline")} 
       onGoPost={() => setScreen("post")}
       onGoProfile={() => setScreen("profile")} 
+      onGoSearch={() => setScreen("search")}
+      onGoNotify={() => setScreen("notify")}
     />;
   }
   if (screen === "notify") {
@@ -77,6 +79,8 @@ function App() {
       onGoPost={() => setScreen("post")}
       onGoDetail={(post) => { setSelectedPost(post); setScreen("detail"); }}
       onGoProfile={() => setScreen("profile")}
+      onGoSearch={() => setScreen("search")}
+      onGoNotify={() => setScreen("notify")}
     />
   );
 }

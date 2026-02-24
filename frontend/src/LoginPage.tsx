@@ -77,7 +77,8 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
     <div className="login-wrapper">
       <div className="login-card">
         <h1>footprints</h1>
-        <p className="login-sub">おかえりなさい</p>
+        <h3 className="poem">あなたの足跡が、誰かの明日となる。</h3>
+        <p className="login-sub">その場所に行くと見える、新しいSNS。</p>
 
         <div className="tab-row">
           <button className={`tab-btn ${tab === "login" ? "active" : ""}`} onClick={() => setTab("login")}>ログイン</button>

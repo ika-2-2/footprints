@@ -110,7 +110,7 @@ export default function LoginPage({ onLogin }: { onLogin: (info: LoginInfo) => v
                   onBlur={() => setRegPasswordError(validatePassword(regPassword))}
                 />
                 <button type="button" className="toggle-pw" onClick={() => setShowPassword(v => !v)}>
-                  {showPassword ? "🙈" : "👁"}
+                  {showPassword ? <i className="fa-solid fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
                 </button>
               </div>
               <p className="field-hint">半角英数字・4文字以上</p>

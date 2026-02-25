@@ -1,5 +1,5 @@
 import "./css/common.css";
-
+ 
 type Props = {
   active: "timeline" | "post" | "detail" | "search" | "notify" | "mypage";
   onGoTimeline: () => void;

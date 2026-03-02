@@ -25,12 +25,7 @@ Base.metadata.create_all(bind=engine)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://footprints-1ok.pages.dev",
-        "https://60780539.footprints-1ok.pages.dev",
-        "https://bcc7dbc6.footprints-1ok.pages.dev",
-        "http://localhost:5173",
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

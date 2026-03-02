@@ -28,7 +28,7 @@ app.add_middleware(
     allow_origins=[
         "https://footprints-1ok.pages.dev",
         "https://60780539.footprints-1ok.pages.dev",
-        "http://192.168.0.0:5173",
+        "https://bcc7dbc6.footprints-1ok.pages.dev",
         "http://localhost:5173",
     ],
     allow_credentials=True,
